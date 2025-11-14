@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica de Física: Óptica</title>
+    <!-- Tailwind CSS para un diseño moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- KaTeX para renderizar LaTeX -->
+    <!-- FIX 1: Corregido 'xintegrity' a 'integrity' en las 3 líneas siguientes -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3CQDEZwgMAFdscFADSQLiCasiAcA5dAyMI3YtnRU9OFEdUT4z" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctMQanyES51" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f9ff; /* Light blue */
+            color: #075985; /* Dark blue for text */
+            background-image:
+                radial-gradient(ellipse at top left, rgba(56, 189, 248, 0.1) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(14, 165, 233, 0.1) 0%, transparent 50%);
+        }
+        .quiz-panel {
+            background-color: #ffffff;
+            border: 1px solid #e0f2fe;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .option-btn {
+            background-color: #f0f9ff;
+            border-color: #e0f2fe;
+            transition: all 0.2s ease-in-out;
+            color: #0c4a6e;
+            text-align: left;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            display: block;
+        }
+        .option-btn:not(:disabled):hover {
+            border-color: #0ea5e9; /* Sky blue */
+            background-color: #e0f2fe; /* Lighter sky blue */
+            color: #0c4a6e;
+        }
+        .option-btn.correct {
+            background-color: #a7f3d0; /* Greenish */
+            color: #065f46;
+            border-color: #6ee7b7;
+        }
+        .option-btn.incorrect {
+            background-color: #ffcdd2; /* Reddish pink */
+            color: #b71c1c;
+            border-color: #ef9a9a;
+        }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.8; }
+        .primary-btn {
+            background-color: #0ea5e9; /* Sky blue */
+            color: white;
+            transition: background-color 0.2s;
+        }
+        .primary-btn:hover { background-color: #0284c7; /* Darker sky blue */ }
+        .feedback-list li::before {
+            content: '✓';
+            color: #0ea5e9;
+            font-weight: bold;
+            margin-right: 0.75rem;
+        }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        .fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <div id="quiz-container" class="w-full max-w-3xl quiz-panel p-6 sm:p-8 rounded-lg shadow-2xl transition-opacity duration-500 my-8">
+
+        <div id="start-screen" class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 tracking-tight">Práctica de Óptica 💡</h1>
+            <p class="text-lg text-gray-600 mt-2 mb-6">Módulo: Reflexión y Refracción</p>
+            <p class="text-gray-700 mb-8 text-left">Resuelve los siguientes problemas. Selecciona un modo para empezar:</p>
+            <div class="flex flex-col sm:flex-row gap-4" id="mode-selection-btns">
+                <button id="linear-mode-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Modo Lineal</button>
+                <button id="select-mode-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Seleccionar Problema</button>
+            </div>
+            <div id="problem-list" class="flex flex-col gap-4 mt-6 hidden"></div>
+        </div>
+
+        <div id="question-screen" class="hidden">
+            <div class="w-full bg-gray-200 h-2 rounded-full mb-4">
+                <div id="progress-bar" class="bg-sky-500 h-full rounded-full" style="width: 0%; transition: width 0.5s ease-in-out;"></div>
+            </div>
+            <div id="question-content" class="transition-opacity duration-500">
+                <p class="text-sm font-semibold text-sky-600" id="question-counter"></p>
+                <h2 class="text-xl sm:text-2xl text-gray-800 mt-2 font-semibold" id="question-text"></h2>
+                
+                <!-- El contenedor de imagen se mantiene por si se añaden imágenes en el futuro, pero no se usa en esta data. -->
+                <div id="circuit-image-container" class="my-4 text-center hidden">
+                    <img id="circuit-image" class="inline-block border border-gray-300 rounded-lg" src="" alt="Diagrama del problema" style="max-height: 250px;">
+                </div>
+
+                <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6"></div>
+
+                <div id="feedback-container" class="hidden p-4 rounded-lg mt-4 text-sm border-l-4">
+                    <p class="font-bold text-lg mb-3 flex items-center" id="feedback-title"></p>
+                    <p class="font-bold text-gray-800 mb-2 text-base">Solución Detallada:</p>
+                    <div id="feedback-explanation"></div>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                <button id="back-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg hidden">Anterior</button>
+                <button id="next-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg hidden">Siguiente</button>
+            </div>
+            <button id="main-menu-btn" class="primary-btn w-full mt-4 font-bold py-3 px-6 rounded-lg text-lg">Menú Principal</button>
+        </div>
+
+        <div id="results-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">¡Práctica Completada! 💡</h2>
+            <p class="text-xl text-gray-600 mb-6">Resultado Final:</p>
+            <div class="bg-gray-200 border-2 border-sky-500 text-sky-600 text-5xl font-bold rounded-full w-36 h-36 flex items-center justify-center mx-auto mb-8 shadow-lg" id="score-display">
+            </div>
+            <p id="rank-text" class="text-xl text-sky-600 font-semibold mb-8"></p>
+            <button id="restart-btn" class="primary-btn w-full font-bold py-3 px-6 rounded-lg text-lg">Reiniciar Práctica</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Llamamos a nuestra función 'renderKatex' centralizada
+            renderKatex();
+        });
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        const quizData = [
+            {
+                name: "Espejos en ángulo",
+                question: "<strong>1.</strong> Dos espejos planos se intersectan en ángulos rectos. Un rayo láser incide en el espejo horizontal en un punto a $11.5 \\, cm$ de la intersección. ¿Para qué ángulo de incidencia $\\theta_i$ (medido con la normal) el rayo incidirá en el punto medio del espejo vertical (que mide $28.0 \\, cm$ de largo)?",
+                image: "https://i.imgur.com/QPC4qsn.png",
+                options: [
+                    { text: "$39.4^{\\circ}$", correct: true },
+                    { text: "$50.6^{\\circ}$", correct: false },
+                    { text: "$45.0^{\\circ}$", correct: false },
+                    { text: "$25.5^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `El rayo incide en $(11.5, 0)$ y debe golpear el punto medio del otro espejo, en $(0, 14.0)$.<br>
+                            Sea $\\alpha$ el ángulo que el rayo reflejado forma con el espejo horizontal. Por geometría:<br>
+                            $\\tan(\\alpha) = \\dfrac{\\text{opuesto}}{\\text{adyacente}} = \\dfrac{14.0 \\, cm}{11.5 \\, cm} \\approx 1.217$<br>
+                            $\\alpha = \\arctan(1.217) \\approx 50.6^{\\circ}$<br>
+                            Por la ley de reflexión, el ángulo de incidencia (respecto al espejo) es igual al de reflexión. Así, el rayo *incidente* también forma un ángulo $\\alpha = 50.6^{\\circ}$ con la superficie.<br>
+                            El ángulo de incidencia $\\theta_i$ se mide con la normal (perpendicular al espejo):<br>
+                            $\\theta_i = 90^{\\circ} - \\alpha = 90^{\\circ} - 50.6^{\\circ} = 39.4^{\\circ}$`
+                }
+            },
+            {
+                name: "Luz en el ojo",
+                question: "<strong>2.</strong> El humor vítreo del ojo tiene $n=1.34$. La luz visible en el aire ($\u2248$ vacío) va de $380 \\, nm$ (violeta) a $750 \\, nm$ (rojo). ¿Cuáles son los rangos de a) longitud de onda $\\lambda_n$ y b) frecuencia $f$ dentro del humor vítreo?",
+                options: [
+                    { text: "a) $284-560 \\, nm$, b) $4.0-7.9 \\times 10^{14} \\, Hz$", correct: true },
+                    { text: "a) $380-750 \\, nm$, b) $4.0-7.9 \\times 10^{14} \\, Hz$", correct: false },
+                    { text: "a) $284-560 \\, nm$, b) $3.0-5.9 \\times 10^{14} \\, Hz$", correct: false },
+                    { text: "a) $509-1005 \\, nm$, b) $4.0-7.9 \\times 10^{14} \\, Hz$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>a) Longitud de onda $\\lambda_n$:</strong><br>
+                            $\\lambda_n = \\dfrac{\\lambda_{vac}}{n}$<br>
+                            $\\lambda_{min} = \\dfrac{380 \\, nm}{1.34} \\approx 284 \\, nm$<br>
+                            $\\lambda_{max} = \\dfrac{750 \\, nm}{1.34} \\approx 560 \\, nm$<br><br>
+                            <strong>b) Frecuencia $f$:</strong><br>
+                            La frecuencia no cambia al entrar a un nuevo medio.<br>
+                            $f = \\dfrac{c}{\\lambda_{vac}}$<br>
+                            $f_{min} = \\dfrac{3.0 \\times 10^8 \\, m/s}{750 \\times 10^{-9} \\, m} = 4.0 \\times 10^{14} \\, Hz$<br>
+                            $f_{max} = \\dfrac{3.0 \\times 10^8 \\, m/s}{380 \\times 10^{-9} \\, m} = 7.9 \\times 10^{14} \\, Hz$`
+                }
+            },
+            {
+                name: "Luz en líquido",
+                question: "<strong>3.</strong> Un haz de luz tiene $\\lambda_{vac} = 650 \\, nm$. En un líquido, su índice de refracción es $n=1.47$. ¿Cuál es a) la rapidez $v$ y b) la longitud de onda $\\lambda_n$ en el líquido?",
+                options: [
+                    { text: "a) $2.04 \\times 10^8 \\, m/s$, b) $442 \\, nm$", correct: true },
+                    { text: "a) $3.00 \\times 10^8 \\, m/s$, b) $650 \\, nm$", correct: false },
+                    { text: "a) $2.04 \\times 10^8 \\, m/s$, b) $650 \\, nm$", correct: false },
+                    { text: "a) $3.00 \\times 10^8 \\, m/s$, b) $442 \\, nm$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>a) Rapidez $v$:</strong><br>
+                            $v = \\dfrac{c}{n} = \\dfrac{3.0 \\times 10^8 \\, m/s}{1.47} \\approx 2.04 \\times 10^8 \\, m/s$<br><br>
+                            <strong>b) Longitud de onda $\\lambda_n$:</strong><br>
+                            $\\lambda_n = \\dfrac{\\lambda_{vac}}{n} = \\dfrac{650 \\, nm}{1.47} \\approx 442 \\, nm$`
+                }
+            },
+            {
+                name: "Frecuencia y $\\lambda$",
+                question: "<strong>4.</strong> Luz con frecuencia $f = 5.80 \\times 10^{14} \\, Hz$ viaja en un vidrio con $n=1.52$. ¿Cuál es la longitud de onda $\\lambda$ a) en el vacío y b) en el vidrio?",
+                options: [
+                    { text: "a) $517 \\, nm$, b) $340 \\, nm$", correct: true },
+                    { text: "a) $517 \\, nm$, b) $786 \\, nm$", correct: false },
+                    { text: "a) $340 \\, nm$, b) $517 \\, nm$", correct: false },
+                    { text: "a) $786 \\, nm$, b) $517 \\, nm$", correct: false }
+                ],
+                solution: {
+                    text: `La frecuencia $f$ es la misma en ambos medios.<br><br>
+                            <strong>a) Vacío:</strong><br>
+                            $\\lambda_{vac} = \\dfrac{c}{f} = \\dfrac{3.0 \\times 10^8 \\, m/s}{5.80 \\times 10^{14} \\, Hz} \\approx 5.17 \\times 10^{-7} \\, m = 517 \\, nm$<br><br>
+                            <strong>b) Vidrio:</strong><br>
+                            $\\lambda_n = \\dfrac{\\lambda_{vac}}{n} = \\dfrac{517 \\, nm}{1.52} \\approx 340 \\, nm$<br>
+                            (Alternativamente: $v = c/n$, $\\lambda_n = v/f$)`
+                }
+            },
+            {
+                name: "Luz en cuarzo",
+                question: "<strong>5.</strong> Un haz de luz viaja a $v = 1.94 \\times 10^8 \\, m/s$ en cuarzo, con $\\lambda_n = 355 \\, nm$. a) ¿Cuál es el índice de refracción $n$? b) ¿Cuál es su longitud de onda $\\lambda_{vac}$ en el aire?",
+                options: [
+                    { text: "a) $n=1.55$, b) $550 \\, nm$", correct: true },
+                    { text: "a) $n=0.65$, b) $230 \\, nm$", correct: false },
+                    { text: "a) $n=1.55$, b) $355 \\, nm$", correct: false },
+                    { text: "a) $n=0.65$, b) $550 \\, nm$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>a) Índice de refracción $n$:</strong><br>
+                            $n = \\dfrac{c}{v} = \\dfrac{3.0 \\times 10^8 \\, m/s}{1.94 \\times 10^8 \\, m/s} \\approx 1.55$<br><br>
+                            <strong>b) Longitud de onda en vacío $\\lambda_{vac}$:</strong><br>
+                            $\\lambda_{vac} = \\lambda_n \\cdot n = (355 \\, nm)(1.55) \\approx 550 \\, nm$`
+                }
+            },
+            {
+                name: "Agua a Benceno",
+                question: "<strong>6.</strong> Luz tiene $\\lambda_{agua} = 438 \\, nm$ en agua ($n_{agua} \\approx 1.33$). ¿Cuál es su longitud de onda $\\lambda_{benceno}$ en benceno ($n_{benceno} \\approx 1.50$)?",
+                options: [
+                    { text: "$388 \\, nm$", correct: true },
+                    { text: "$494 \\, nm$", correct: false },
+                    { text: "$582 \\, nm$", correct: false },
+                    { text: "$438 \\, nm$", correct: false }
+                ],
+                solution: {
+                    text: `La frecuencia $f$ es constante. Primero, encontramos $\\lambda_{vac}$:<br>
+                            $\\lambda_{vac} = \\lambda_{agua} \\cdot n_{agua} = (438 \\, nm)(1.33) \\approx 582.5 \\, nm$<br><br>
+                            Ahora, encontramos $\\lambda_{benceno}$:<br>
+                            $\\lambda_{benceno} = \\dfrac{\\lambda_{vac}}{n_{benceno}} = \\dfrac{582.5 \\, nm}{1.50} \\approx 388 \\, nm$`
+                }
+            },
+            {
+                name: "Ángulos en vidrio",
+                question: "<strong>7.</strong> Un haz de luz en aire forma un ángulo de $47.5^{\\circ}$ con la *superficie* de una placa de vidrio ($n=1.66$). a) ¿Cuál es el ángulo entre el haz *reflejado* y la *superficie*? b) ¿Cuál es el ángulo entre el haz *refractado* y la *superficie*?",
+                options: [
+                    { text: "a) $47.5^{\\circ}$, b) $66.0^{\\circ}$", correct: true },
+                    { text: "a) $42.5^{\\circ}$, b) $24.0^{\\circ}$", correct: false },
+                    { text: "a) $47.5^{\\circ}$, b) $24.0^{\\circ}$", correct: false },
+                    { text: "a) $42.5^{\\circ}$, b) $66.0^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `El ángulo de incidencia $\\theta_1$ es con la normal:<br>
+                            $\\theta_1 = 90^{\\circ} - 47.5^{\\circ} = 42.5^{\\circ}$<br><br>
+                            <strong>a) Reflexión:</strong><br>
+                            El ángulo de reflexión $\\theta_r = \\theta_1 = 42.5^{\\circ}$ (con la normal).<br>
+                            El ángulo con la superficie es $90^{\\circ} - 42.5^{\\circ} = 47.5^{\\circ}$.<br><br>
+                            <strong>b) Refracción (Ley de Snell):</strong><br>
+                            $n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$<br>
+                            $1.00 \\cdot \\sin(42.5^{\\circ}) = 1.66 \\cdot \\sin(\\theta_2)$<br>
+                            $\\sin(\\theta_2) = \\dfrac{\\sin(42.5^{\\circ})}{1.66} \\approx 0.407$<br>
+                            $\\theta_2 = \\arcsin(0.407) \\approx 24.0^{\\circ}$ (este es el ángulo con la normal).<br>
+                            El ángulo con la superficie es $90^{\\circ} - 24.0^{\\circ} = 66.0^{\\circ}$.`
+                }
+            },
+            {
+                name: "Retardo de láser",
+                question: "<strong>8.</strong> Un haz láser atraviesa un bloque de $2.50 \\, m$ de grosor. Un detector mide un retardo de $\\Delta t = 6.25 \\, ns$ comparado con un haz que viaja la misma distancia en aire. ¿Cuál es el índice de refracción $n$ del material?",
+                image: "https://i.imgur.com/dymDiW9.png",
+                options: [
+                    { text: "$1.75$", correct: true },
+                    { text: "$1.25$", correct: false },
+                    { text: "$0.75$", correct: false },
+                    { text: "$2.50$", correct: false }
+                ],
+                solution: {
+                    text: `Sea $L = 2.50 \\, m$.<br>
+                            $t_{aire} = \\dfrac{L}{c}$<br>
+                            $t_{bloque} = \\dfrac{L}{v} = \\dfrac{L}{c/n} = \\dfrac{nL}{c}$<br><br>
+                            El retardo es $\\Delta t = t_{bloque} - t_{aire}$:<br>
+                            $\\Delta t = \\dfrac{nL}{c} - \\dfrac{L}{c} = \\dfrac{L}{c}(n - 1)$<br><br>
+                            Calculamos $\\dfrac{L}{c}$: $t_{aire} = \\dfrac{2.50 \\, m}{3.0 \\times 10^8 \\, m/s} \\approx 8.33 \\times 10^{-9} \\, s$ (ó $8.33 \\, ns$).<br><br>
+                            $6.25 \\, ns = (8.33 \\, ns) \\cdot (n - 1)$<br>
+                            $n - 1 = \\dfrac{6.25}{8.33} \\approx 0.75$<br>
+                            $n = 1.75$`
+                }
+            },
+            {
+                name: "Luz en plástico",
+                question: "<strong>9.</strong> Luz en aire ($n_1=1.00$) incide en plástico con $\\theta_1 = 62.7^{\\circ}$. El ángulo refractado es $\\theta_2 = 48.1^{\\circ}$. Determine la rapidez de la luz $v$ en el plástico.",
+                options: [
+                    { text: "$2.52 \\times 10^8 \\, m/s$", correct: true },
+                    { text: "$3.00 \\times 10^8 \\, m/s$", correct: false },
+                    { text: "$2.25 \\times 10^8 \\, m/s$", correct: false },
+                    { text: "$1.19 \\times 10^8 \\, m/s$", correct: false }
+                ],
+                solution: {
+                    text: `Primero, usamos la Ley de Snell para hallar $n_2$ (plástico):<br>
+                            $n_1 \\sin(\\theta_1) = n_2 \\sin(\\theta_2)$<br>
+                            $1.00 \\cdot \\sin(62.7^{\\circ}) = n_2 \\cdot \\sin(48.1^{\\circ})$<br>
+                            $n_2 = \\dfrac{\\sin(62.7^{\\circ})}{\\sin(48.1^{\\circ})} = \\dfrac{0.889}{0.744} \\approx 1.194$<br><br>
+                            Ahora, calculamos la rapidez $v$ en el plástico:<br>
+                            $v = \\dfrac{c}{n_2} = \\dfrac{3.0 \\times 10^8 \\, m/s}{1.194} \\approx 2.52 \\times 10^8 \\, m/s$`
+                }
+            },
+            {
+                name: "Líquido desconocido",
+                question: "<strong>10.</strong> Un tanque de paredes de vidrio ($n_g=1.55$) se llena con un líquido. Luz incide desde el aire ($n_a=1.00$) a $\\theta_a = 41.3^{\\circ}$. Entra al líquido a $\\theta_{liq} = 20.2^{\\circ}$. ¿Cuál es el índice de refracción $n_{liq}$ del líquido?",
+                options: [
+                    { text: "$1.91$", correct: true },
+                    { text: "$1.55$", correct: false },
+                    { text: "$1.33$", correct: false },
+                    { text: "$2.84$", correct: false }
+                ],
+                solution: {
+                    text: `Para capas planas y paralelas (aire -> vidrio -> líquido), el índice del vidrio intermedio no afecta la relación entre el ángulo de entrada y el de salida. <br>
+                            Podemos usar una Ley de Snell modificada:
+                            $n_{aire} \\sin(\\theta_{aire}) = n_{liq} \\sin(\\theta_{liq})$<br><br>
+                            $1.00 \\cdot \\sin(41.3^{\\circ}) = n_{liq} \\cdot \\sin(20.2^{\\circ})$<br>
+                            $0.660 = n_{liq} \\cdot (0.345)$<br>
+                            $n_{liq} = \\dfrac{0.660}{0.345} \\approx 1.91$`
+                }
+            },
+            // --- NUEVO PROBLEMA 11 ---
+            {
+                name: "Capas de refracción",
+                question: "<strong>11.</strong> Como se muestra en la figura, una capa de agua ($n_{agua} = 1.33$) cubre una placa de material X en un vaso. Un rayo de luz que viaja hacia arriba sigue la trayectoria indicada. Determine: a) el índice de refracción del material X, y b) el ángulo que forma la luz con la normal en el aire ($n_{aire} = 1.00$).",
+                image: "https://i.imgur.com/9cte0sW.png",
+                options: [
+                    { text: "a) $n_X \\approx 2.34$, b) $\\theta_A \\approx 81.2^{\\circ}$", correct: true },
+                    { text: "a) $n_X \\approx 1.09$, b) $\\theta_A \\approx 81.2^{\\circ}$", correct: false },
+                    { text: "a) $n_X \\approx 2.34$, b) $\\theta_A = 48^{\\circ}$", correct: false },
+                    { text: "a) $n_X \\approx 1.78$, b) $\\theta_A \\approx 65^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>Paso 1: Interpretar los ángulos de la figura.</strong><br>
+                            El ángulo en el material X se da con la *superficie* ($\alpha = 65^{\\circ}$). El ángulo de incidencia (con la normal) es $\\theta_X = 90^{\\circ} - 65^{\\circ} = 25^{\\circ}$.<br>
+                            El ángulo en el agua se da con la *normal* ($\theta_W = 48^{\\circ}$). Este es el ángulo de refracción para la primera interfaz y el de incidencia para la segunda.<br><br>
+                            
+                            <strong>a) Calcular el índice de refracción $n_X$:</strong><br>
+                            Usamos la Ley de Snell en la interfaz X-Agua: $n_X \\sin(\\theta_X) = n_{agua} \\sin(\\theta_W)$<br>
+                            $n_X \\sin(25^{\\circ}) = 1.33 \\sin(48^{\\circ})$<br>
+                            $n_X (0.4226) = 1.33 (0.7431)$<br>
+                            $n_X (0.4226) \\approx 0.9883$<br>
+                            $n_X = \\dfrac{0.9883}{0.4226} \\approx 2.339 \\approx 2.34$<br><br>
+
+                            <strong>b) Calcular el ángulo en el aire $\\theta_A$:</strong><br>
+                            Usamos la Ley de Snell en la interfaz Agua-Aire: $n_{agua} \\sin(\\theta_W) = n_{aire} \\sin(\\theta_A)$<br>
+                            $1.33 \\sin(48^{\\circ}) = 1.00 \\sin(\\theta_A)$<br>
+                            $0.9883 = \\sin(\\theta_A)$<br>
+                            $\\theta_A = \\arcsin(0.9883) \\approx 81.2^{\\circ}$`
+                }
+            },
+            // --- FIN DE PROBLEMA 11 ---
+            // --- NUEVO PROBLEMA 12 ---
+            {
+                name: "Reflexión Interna Total",
+                question: "<strong>12.</strong> Una pieza plana de vidrio cubre un cilindro lleno de agua. Un rayo de luz en el vidrio incide en la interfase vidrio-agua a $\\theta_1 = 36.2^{\\circ}$, y se refracta en el agua a $\\theta_2 = 49.8^{\\circ}$. ¿Cuál es el valor más pequeño del ángulo incidente en el *vidrio* ($\\theta_c$) con el que el rayo no se refractará en el agua (sufrirá reflexión interna total)?",
+                options: [
+                    { text: "$50.7^{\\circ}$", correct: true },
+                    { text: "$36.2^{\\circ}$", correct: false },
+                    { text: "$49.8^{\\circ}$", correct: false },
+                    { text: "$39.3^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>Paso 1: Hallar la relación de los índices de refracción.</strong><br>
+                            Usamos la Ley de Snell para los datos dados (Vidrio -> Agua): $n_{vidrio} \\sin(\\theta_{vidrio}) = n_{agua} \\sin(\\theta_{agua})$<br>
+                            $n_v \\sin(36.2^{\\circ}) = n_a \\sin(49.8^{\\circ})$<br>
+                            Despejamos la relación $\\frac{n_a}{n_v}$ (agua/vidrio), que necesitaremos para la reflexión interna total, ya que $n_v > n_a$ (la luz se aleja de la normal).<br>
+                            ` + // Se divide en dos líneas para evitar problemas de formato
+                            `$\\dfrac{n_a}{n_v} = \\dfrac{\\sin(36.2^{\\circ})}{\\sin(49.8^{\\circ})} = \\dfrac{0.5906}{0.7638} \\approx 0.7734$<br><br>
+                            <strong>Paso 2: Calcular el ángulo crítico ($\theta_c$).</strong><br>
+                            La pregunta pide el ángulo mínimo para que el rayo *no se refracte*, lo cual es la definición del ángulo crítico ($\theta_c$) para la reflexión interna total (TIR).<br>
+                            La TIR ocurre cuando el ángulo de refracción es $90^{\\circ}$.<br>
+                            $n_{vidrio} \\sin(\\theta_c) = n_{agua} \\sin(90^{\\circ})$<br>
+                            ` + // Se divide en dos líneas
+                            `$\\sin(\\theta_c) = \\dfrac{n_{agua}}{n_{vidrio}} (1)$<br>
+                            Sustituimos la relación que encontramos en el Paso 1:<br>
+                            $\\sin(\\theta_c) = 0.7734$<br>
+                            $\\theta_c = \\arcsin(0.7734) \\approx 50.65^{\\circ} \\approx 50.7^{\\circ}$`
+                }
+            },
+            // --- FIN DE PROBLEMA 12 ---
+            // --- INICIO PROBLEMA 13 ---
+            {
+                name: "Líquido y Aire",
+                question: "<strong>13.</strong> El ángulo crítico para la reflexión interna total en una interfase líquido-aire es de $42.5^{\\circ}$.<br><strong>a)</strong> Si un rayo en el líquido incide a $35.0^{\\circ}$, ¿qué ángulo forma el rayo refractado en el aire con la normal?<br><strong>b)</strong> Si un rayo en el aire incide a $35.0^{\\circ}$, ¿qué ángulo forma el rayo refractado en el líquido con la normal?",
+                options: [
+                    { text: "a) $58.1^{\\circ}$, b) $22.8^{\\circ}$", correct: true },
+                    { text: "a) $58.1^{\\circ}$, b) $35.0^{\\circ}$", correct: false },
+                    { text: "a) $22.8^{\\circ}$, b) $58.1^{\\circ}$", correct: false },
+                    { text: "a) $42.5^{\\circ}$, b) $28.0^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>Paso 1: Hallar el índice $n_{liq}$ del líquido.</strong><br>
+                            El ángulo crítico $\\theta_c = 42.5^{\\circ}$ se da para la refracción de líquido a aire ($n_{aire}=1.0$).<br>
+                            $n_{liq} \\sin(\\theta_c) = n_{aire} \\sin(90^{\\circ})$<br>
+                            $n_{liq} \\sin(42.5^{\\circ}) = 1.0$<br>
+                            $n_{liq} = \\dfrac{1}{\\sin(42.5^{\\circ})} = \\dfrac{1}{0.6756} \\approx 1.480$<br><br>
+                            
+                            <strong>a) Rayo de Líquido a Aire:</strong><br>
+                            $n_{liq} \\sin(\\theta_{liq}) = n_{aire} \\sin(\\theta_{aire})$<br>
+                            $1.480 \\cdot \\sin(35.0^{\\circ}) = 1.0 \\cdot \\sin(\\theta_{aire})$<br>
+                            $0.849 = \\sin(\\theta_{aire})$<br>
+                            $\\theta_{aire} = \\arcsin(0.849) \\approx 58.1^{\\circ}$<br><br>
+                            
+                            <strong>b) Rayo de Aire a Líquido:</strong><br>
+                            $n_{aire} \\sin(\\theta_{aire}) = n_{liq} \\sin(\\theta_{liq})$<br>
+                            $1.0 \\cdot \\sin(35.0^{\\circ}) = 1.480 \\cdot \\sin(\\theta_{liq})$<br>
+                            $\\sin(\\theta_{liq}) = \\dfrac{\\sin(35.0^{\\circ})}{1.480} = \\dfrac{0.5736}{1.480} \\approx 0.3876$<br>
+                            $\\theta_{liq} = \\arcsin(0.3876) \\approx 22.8^{\\circ}$`
+                }
+            },
+            // --- FIN DE PROBLEMA 13 ---
+            // --- INICIO PROBLEMA 14 ---
+            {
+                name: "El Anillo de Brunilda",
+                question: "<strong>14.</strong> Al finalizar la serie de óperas de Wagner que lleva por título <i>El Anillo de los Nibelungos</i>, Brunilda quita el anillo de oro del cadáver de Sigfrido y lo arroja al río Rin, donde se va al fondo. Si se supone que el anillo es un punto y que el río tiene $10.0 \\, m$ de profundidad ($n_{agua} = 1.333$), ¿cuál es el área del círculo más grande en la superficie por donde podría llegar luz emitida por el anillo y salir del agua?",
+                options: [
+                    { text: "$401 \\, m^2$", correct: true },
+                    { text: "$113 \\, m^2$", correct: false },
+                    { text: "$356 \\, m^2$", correct: false },
+                    { text: "$314 \\, m^2$", correct: false }
+                ],
+                solution: {
+                    text: `La luz solo puede escapar si el ángulo de incidencia (medido desde la normal en el agua) es *menor* que el ángulo crítico $\\theta_c$. El borde del círculo de luz está definido por $\\theta_c$.<br><br>
+                            
+                            <strong>Paso 1: Calcular el ángulo crítico $\\theta_c$ (Agua -> Aire).</strong><br>
+                            $n_{agua} \\sin(\\theta_c) = n_{aire} \\sin(90^{\\circ})$<br>
+                            $1.333 \\cdot \\sin(\\theta_c) = 1.0$<br>
+                            $\\sin(\\theta_c) = \\dfrac{1}{1.333} \\approx 0.750$<br>
+                            $\\theta_c = \\arcsin(0.750) \\approx 48.6^{\\circ}$<br><br>
+
+                            <strong>Paso 2: Calcular el radio $r$ del círculo.</strong><br>
+                            El radio $r$ en la superficie y la profundidad $d = 10.0 \\, m$ forman un triángulo rectángulo con el ángulo $\\theta_c$.<br>
+                            $\\tan(\\theta_c) = \\dfrac{r}{d}$<br>
+                            $r = d \\cdot \\tan(\\theta_c) = (10.0 \\, m) \\cdot \\tan(48.6^{\\circ})$<br>
+                            $r = (10.0 \\, m) \\cdot (1.134) \\approx 11.3 \\, m$<br><br>
+                            
+                            <strong>Paso 3: Calcular el Área $A$.</strong><br>
+                            $A = \\pi r^2 = \\pi (11.3 \\, m)^2 \\approx 401 \\, m^2$`
+                }
+            }
+            // --- FIN DE PROBLEMA 14 ---
+            ,
+            // --- INICIO PROBLEMA 15 ---
+            {
+                name: "Llave en la alberca",
+                question: "<strong>15.</strong> Usted perdió la llave en la alberca. Sostiene una linterna a $1.2 \\, m$ sobre la superficie y la dirige hacia el agua a una distancia horizontal de $1.5 \\, m$ del borde. La luz ilumina la llave en el fondo. Si la alberca tiene $4.0 \\, m$ de profundidad en ese punto, ¿a qué distancia horizontal total del borde se encuentra la llave? (Use $n_{aire} = 1.00$, $n_{agua} = 1.333$)",
+                // <!-- FIX 2: Corregida la URL de la imagen. Debe ser un enlace directo (i.imgur.com) y terminar en .png -->
+                image: "https://i.imgur.com/ZGZNM88.png",
+                options: [
+                    { text: "$4.4 \\, m$", correct: true },
+                    { text: "$2.9 \\, m$", correct: false },
+                    { text: "$6.4 \\, m$", correct: false },
+                    { text: "$5.2 \\, m$", correct: false }
+                ],
+                solution: {
+                    text: `El problema requiere dos pasos: encontrar el ángulo de refracción y luego usarlo para encontrar la distancia en el fondo.<br><br>
+                            <strong>Paso 1: Calcular el ángulo de incidencia $\\theta_a$ (en el aire).</strong><br>
+                            El rayo forma un triángulo en el aire con $opuesto = 1.5 \\, m$ y $adyacente = 1.2 \\, m$.<br>
+                            $\\tan(\\theta_a) = \\dfrac{1.5 \\, m}{1.2 \\, m} = 1.25$<br>
+                            $\\theta_a = \\arctan(1.25) \\approx 51.3^{\\circ}$<br><br>
+    
+                            <strong>Paso 2: Calcular el ángulo de refracción $\\theta_b$ (en el agua).</strong><br>
+                            Usamos la Ley de Snell: $n_a \\sin(\\theta_a) = n_b \\sin(\\theta_b)$<br>
+                            $1.00 \\cdot \\sin(51.3^{\\circ}) = 1.333 \\cdot \\sin(\\theta_b)$<br>
+                            $\\sin(\\theta_b) = \\dfrac{1.00 \\cdot 0.780}{1.333} \\approx 0.585$<br>
+                            $\\theta_b = \\arcsin(0.585) \\approx 35.8^{\\circ}$<br><br>
+                            
+                            <strong>Paso 3: Calcular la distancia horizontal $x$ en el agua.</strong><br>
+                            El rayo forma un segundo triángulo en el agua con profundidad $d = 4.0 \\, m$.<br>
+                            $\\tan(\\theta_b) = \\dfrac{x}{d}$<br>
+                            $x = d \\cdot \\tan(\\theta_b) = (4.0 \\, m) \\cdot \\tan(35.8^{\\circ})$<br>
+                            $x = (4.0 \\, m) \\cdot 0.721 \\approx 2.9 \\, m$<br><br>
+    
+                            <strong>Paso 4: Calcular la distancia total.</strong><br>
+                            $x_{total} = x_{aire} + x_{agua} = 1.5 \\, m + 2.9 \\, m = 4.4 \\, m$`
+                }
+            }
+            // --- FIN DE PROBLEMA 15 ---
+            ,
+            // --- INICIO PROBLEMA 16 (COMBINADO) ---
+            {
+                name: "Desplazamiento (Teoría y Cálculo)",
+                question: "<strong>16.</strong> (Parte A) Dada la figura, ¿cuál es la expresión algebraica para el desplazamiento lateral $d$? <br><br> (Parte B) Calcule el valor de $d$ si $\\theta_a = 66.0^{\\circ}$, $n' = 1.80$, $t = 2.40 \\, cm$, y $n_{aire} \\approx 1.00$.",
+                image: "https://i.imgur.com/29AAlNp.png",
+                options: [
+                    { text: "A) $d = \\dfrac{t \\sin(\\theta_a - \\theta_b')}{\\cos \\theta_b'}$ <br> B) $d = 1.62 \\, cm$", correct: true },
+                    { text: "A) $d = \\dfrac{t \\sin(\\theta_a - \\theta_b')}{\\cos \\theta_b'}$ <br> B) $d = 1.98 \\, cm$", correct: false },
+                    { text: "A) $d = t \\sin(\\theta_a - \\theta_b')$ <br> B) $d = 1.20 \\, cm$", correct: false },
+                    { text: "A) $d = \\dfrac{t \\cos(\\theta_b')}{\\sin(\\theta_a - \\theta_b')}$ <br> B) $d = 1.62 \\, cm$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>Respuesta (A): Expresión Algebraica</strong><br>
+                            La expresión se deriva de la geometría. Sea $L$ la hipotenusa del rayo dentro de la placa, $L = \\frac{t}{\\cos \\theta_b'}$.<br>
+                            El desplazamiento $d$ es el cateto opuesto en un triángulo con hipotenusa $L$ y ángulo $(\\theta_a - \\theta_b')$.<br>
+                            $d = L \\sin(\\theta_a - \\theta_b') = \\dfrac{t \\sin(\\theta_a - \\theta_b')}{\\cos \\theta_b'}$<br><br>
+                            
+                            <strong>Respuesta (B): Cálculo Numérico</strong><br>
+                            <strong>Paso 1: Calcular $\\theta_b'$ (Ley de Snell).</strong><br>
+                            $n \\sin(\\theta_a) = n' \\sin(\\theta_b')$<br>
+                            $1.00 \\cdot \\sin(66.0^{\\circ}) = 1.80 \\cdot \\sin(\\theta_b')$<br>
+                            $\\sin(\\theta_b') = \\dfrac{0.9135}{1.80} \\approx 0.5075$<br>
+                            $\\theta_b' = \\arcsin(0.5075) \\approx 30.5^{\\circ}$<br><br>
+                            <strong>Paso 2: Sustituir en la fórmula.</strong><br>
+                            $d = \\dfrac{(2.40 \\, cm) \sin(66.0^{\\circ} - 30.5^{\\circ})}{\\cos(30.5^{\\circ})}$<br>
+                            $d = \\dfrac{(2.40 \\, cm) \sin(35.5^{\\circ})}{\\cos(30.5^{\\circ})}$<br>
+                            $d = \\dfrac{(2.40 \\, cm) \cdot (0.5807)}{0.8616} \\approx 1.62 \\, cm$`
+                }
+            }
+            // --- FIN DE PROBLEMA 16 ---
+        ];
+
+
+        let currentQuestionIndex = 0;
+        let isLinearMode = false;
+        let score = 0;
+        let totalQuestions = quizData.length;
+
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const linearModeBtn = document.getElementById('linear-mode-btn');
+        const selectModeBtn = document.getElementById('select-mode-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const mainMenuBtn = document.getElementById('main-menu-btn');
+        const questionCounter = document.getElementById('question-counter');
+        const questionText = document.getElementById('question-text');
+        const circuitImageContainer = document.getElementById('circuit-image-container');
+        const circuitImage = document.getElementById('circuit-image');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
+        const scoreDisplay = document.getElementById('score-display');
+        const progressBar = document.getElementById('progress-bar');
+        const questionContent = document.getElementById('question-content');
+        const rankText = document.getElementById('rank-text');
+        const problemList = document.getElementById('problem-list');
+        const modeSelectionBtns = document.getElementById('mode-selection-btns');
+        
+        function renderKatex() {
+            // Verificamos si la función 'renderMathInElement' existe antes de llamarla
+            if (typeof renderMathInElement === 'function') {
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        {left: '$$', right: '$$', display: true},
+                        {left: '$', right: '$', display: false},
+                    ],
+                    // trust: true // Use if you have complex custom macros
+                });
+            } else {
+                console.error("KaTeX auto-render.min.js no se cargó correctamente.");
+            }
+        }
+
+        function showNextQuestion() {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                setupQuestion(currentQuestionIndex);
+            } else if (isLinearMode) {
+                showResults();
+            }
+        }
+        
+        function showPreviousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                setupQuestion(currentQuestionIndex);
+            }
+        }
+
+        function showResults() {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            scoreDisplay.textContent = `${score}/${totalQuestions}`;
+            const percentage = (score / totalQuestions) * 100;
+            let rank = "Aprendiz de Óptica";
+            if (percentage >= 75) rank = "Maestro de Lentes";
+            if (percentage >= 95) rank = "Newton Moderno";
+            rankText.textContent = `RANGO OBTENIDO: ${rank}`;
+        }
+
+        function setupQuestion(qIndex) {
+            questionContent.classList.remove('fade-in');
+            void questionContent.offsetWidth; // Trigger reflow
+            questionContent.classList.add('fade-in');
+
+            const questionData = quizData[qIndex];
+            
+            questionCounter.textContent = `PROBLEMA ${qIndex + 1} DE ${totalQuestions}`;
+            questionText.innerHTML = questionData.question;
+            
+            // Lógica para mostrar la imagen si existe
+            if (questionData.image) {
+                circuitImage.src = questionData.image;
+                circuitImageContainer.classList.remove('hidden');
+            } else {
+                circuitImageContainer.classList.add('hidden'); // Ocultamos el contenedor de imagen si no hay
+            }
+            
+            optionsContainer.innerHTML = '';
+            let shuffledOptions = [...questionData.options];
+            if (!questionData.answered) {
+                shuffleArray(shuffledOptions);
+            }
+            
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.innerHTML = option.text;
+                button.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'font-medium');
+                button.dataset.text = option.text; 
+                button.onclick = () => selectAnswer(button);
+                optionsContainer.appendChild(button);
+            });
+            
+            feedbackContainer.classList.add('hidden');
+            backBtn.classList.toggle('hidden', !isLinearMode || qIndex === 0);
+            nextBtn.classList.toggle('hidden', !isLinearMode || qIndex === totalQuestions - 1);
+            mainMenuBtn.classList.remove('hidden');
+
+            const answeredQuestions = quizData.filter(q => q.answered).length;
+            const progress = (answeredQuestions / totalQuestions)* 100;
+            progressBar.style.width = `${progress}%`;
+            
+            renderKatex();
+        }
+
+        function selectAnswer(selectedButton) {
+            const questionData = quizData[currentQuestionIndex];
+            if (questionData.answered) return;
+            questionData.answered = true;
+            
+            const selectedText = selectedButton.dataset.text;
+            const correctOption = questionData.options.find(opt => opt.correct);
+            const isCorrect = correctOption.text === selectedText;
+            
+            const optionButtons = optionsContainer.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => btn.disabled = true);
+            
+            feedbackExplanation.innerHTML = questionData.solution.text;
+            
+            const iconCorrect = '✅';
+            const iconIncorrect = '❌';
+
+            if (isCorrect) {
+                if(isLinearMode) score++;
+                selectedButton.classList.add('correct');
+                feedbackContainer.className = 'p-4 rounded-lg mt-4 text-sm border-l-4 border-teal-500 bg-teal-100 text-teal-800';
+                feedbackTitle.innerHTML = `${iconCorrect} <span>¡Correcto!</span>`;
+            } else {
+                selectedButton.classList.add('incorrect');
+                feedbackContainer.className = 'p-4 rounded-lg mt-4 text-sm border-l-4 border-red-500 bg-red-100 text-red-800';
+                feedbackTitle.innerHTML = `${iconIncorrect} <span>Incorrecto. La respuesta correcta es: ${correctOption.text}</span>`;
+
+                optionButtons.forEach(btn => {
+                    if (btn.dataset.text === correctOption.text) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+            
+            feedbackContainer.classList.remove('hidden');
+            renderKatex();
+
+            const answeredQuestions = quizData.filter(q => q.answered).length;
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            if (isLinearMode && answeredQuestions === totalQuestions) {
+                setTimeout(showResults, 2000);
+            }
+        }
+
+        function resetQuizState() {
+            quizData.forEach(q => q.answered = false);
+            currentQuestionIndex = 0;
+            score = 0;
+            progressBar.style.width = `0%`;
+        }
+
+        function renderProblemList() {
+            problemList.innerHTML = '';
+            quizData.forEach((problem, index) => {
+                const problemBtn = document.createElement('button');
+                problemBtn.innerHTML = `Problema ${index + 1}: ${problem.name}`;
+                problemBtn.classList.add('option-btn', 'w-full', 'p-4', 'border-2', 'rounded-lg', 'text-left', 'font-medium');
+                problemBtn.onclick = () => {
+                    currentQuestionIndex = index;
+                    isLinearMode = false;
+                    startScreen.classList.add('hidden');
+                    questionScreen.classList.remove('hidden');
+                    backBtn.classList.add('hidden');
+                    nextBtn.classList.add('hidden');
+                    setupQuestion(currentQuestionIndex);
+                };
+                problemList.appendChild(problemBtn);
+            });
+            
+            // FIX: Esta llamada es necesaria para renderizar el KaTeX en los botones
+            renderKatex();
+        }
+
+        linearModeBtn.addEventListener('click', () => {
+            isLinearMode = true;
+            resetQuizState();
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            resultsScreen.classList.add('hidden');
+            setupQuestion(currentQuestionIndex);
+        });
+
+        selectModeBtn.addEventListener('click', () => {
+            modeSelectionBtns.classList.add('hidden');
+            problemList.classList.remove('hidden');
+            renderProblemList();
+        });
+
+        backBtn.addEventListener('click', showPreviousQuestion);
+        nextBtn.addEventListener('click', showNextQuestion);
+        
+        mainMenuBtn.addEventListener('click', () => {
+            questionScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            modeSelectionBtns.classList.remove('hidden');
+            problemList.classList.add('hidden');
+            resetQuizState();
+        });
+
+        restartBtn.addEventListener('click', () => {
+            resultsScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            modeSelectionBtns.classList.remove('hidden');
+            problemList.classList.add('hidden');
+            resetQuizState();
+        });
+    </script>
+</body>
+</html>
