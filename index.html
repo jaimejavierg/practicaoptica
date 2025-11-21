@@ -7,7 +7,6 @@
     <!-- Tailwind CSS para un diseño moderno y responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- KaTeX para renderizar LaTeX -->
-    <!-- FIX 1: Corregido 'xintegrity' a 'integrity' en las 3 líneas siguientes -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" xintegrity="sha384-n8MVd4RsNIU0KOV3CQDEZwgMAFdscFADSQLiCasiAcA5dAyMI3YtnRU9OFEdUT4z" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" xintegrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctMQanyES51" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" xintegrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
@@ -94,7 +93,6 @@
                 <p class="text-sm font-semibold text-sky-600" id="question-counter"></p>
                 <h2 class="text-xl sm:text-2xl text-gray-800 mt-2 font-semibold" id="question-text"></h2>
                 
-                <!-- El contenedor de imagen se mantiene por si se añaden imágenes en el futuro, pero no se usa en esta data. -->
                 <div id="circuit-image-container" class="my-4 text-center hidden">
                     <img id="circuit-image" class="inline-block border border-gray-300 rounded-lg" src="" alt="Diagrama del problema" style="max-height: 250px;">
                 </div>
@@ -126,11 +124,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Llamamos a nuestra función 'renderKatex' centralizada
             renderKatex();
         });
 
-        // Fisher-Yates shuffle algorithm
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -327,7 +323,6 @@
                             $n_{liq} = \\dfrac{0.660}{0.345} \\approx 1.91$`
                 }
             },
-            // --- NUEVO PROBLEMA 11 ---
             {
                 name: "Capas de refracción",
                 question: "<strong>11.</strong> Como se muestra en la figura, una capa de agua ($n_{agua} = 1.33$) cubre una placa de material X en un vaso. Un rayo de luz que viaja hacia arriba sigue la trayectoria indicada. Determine: a) el índice de refracción del material X, y b) el ángulo que forma la luz con la normal en el aire ($n_{aire} = 1.00$).",
@@ -357,8 +352,6 @@
                             $\\theta_A = \\arcsin(0.9883) \\approx 81.2^{\\circ}$`
                 }
             },
-            // --- FIN DE PROBLEMA 11 ---
-            // --- NUEVO PROBLEMA 12 ---
             {
                 name: "Reflexión Interna Total",
                 question: "<strong>12.</strong> Una pieza plana de vidrio cubre un cilindro lleno de agua. Un rayo de luz en el vidrio incide en la interfase vidrio-agua a $\\theta_1 = 36.2^{\\circ}$, y se refracta en el agua a $\\theta_2 = 49.8^{\\circ}$. ¿Cuál es el valor más pequeño del ángulo incidente en el *vidrio* ($\\theta_c$) con el que el rayo no se refractará en el agua (sufrirá reflexión interna total)?",
@@ -386,8 +379,6 @@
                             $\\theta_c = \\arcsin(0.7734) \\approx 50.65^{\\circ} \\approx 50.7^{\\circ}$`
                 }
             },
-            // --- FIN DE PROBLEMA 12 ---
-            // --- INICIO PROBLEMA 13 ---
             {
                 name: "Líquido y Aire",
                 question: "<strong>13.</strong> El ángulo crítico para la reflexión interna total en una interfase líquido-aire es de $42.5^{\\circ}$.<br><strong>a)</strong> Si un rayo en el líquido incide a $35.0^{\\circ}$, ¿qué ángulo forma el rayo refractado en el aire con la normal?<br><strong>b)</strong> Si un rayo en el aire incide a $35.0^{\\circ}$, ¿qué ángulo forma el rayo refractado en el líquido con la normal?",
@@ -417,8 +408,6 @@
                             $\\theta_{liq} = \\arcsin(0.3876) \\approx 22.8^{\\circ}$`
                 }
             },
-            // --- FIN DE PROBLEMA 13 ---
-            // --- INICIO PROBLEMA 14 ---
             {
                 name: "El Anillo de Brunilda",
                 question: "<strong>14.</strong> Al finalizar la serie de óperas de Wagner que lleva por título <i>El Anillo de los Nibelungos</i>, Brunilda quita el anillo de oro del cadáver de Sigfrido y lo arroja al río Rin, donde se va al fondo. Si se supone que el anillo es un punto y que el río tiene $10.0 \\, m$ de profundidad ($n_{agua} = 1.333$), ¿cuál es el área del círculo más grande en la superficie por donde podría llegar luz emitida por el anillo y salir del agua?",
@@ -446,14 +435,10 @@
                             <strong>Paso 3: Calcular el Área $A$.</strong><br>
                             $A = \\pi r^2 = \\pi (11.3 \\, m)^2 \\approx 401 \\, m^2$`
                 }
-            }
-            // --- FIN DE PROBLEMA 14 ---
-            ,
-            // --- INICIO PROBLEMA 15 ---
+            },
             {
                 name: "Llave en la alberca",
                 question: "<strong>15.</strong> Usted perdió la llave en la alberca. Sostiene una linterna a $1.2 \\, m$ sobre la superficie y la dirige hacia el agua a una distancia horizontal de $1.5 \\, m$ del borde. La luz ilumina la llave en el fondo. Si la alberca tiene $4.0 \\, m$ de profundidad en ese punto, ¿a qué distancia horizontal total del borde se encuentra la llave? (Use $n_{aire} = 1.00$, $n_{agua} = 1.333$)",
-                // <!-- FIX 2: Corregida la URL de la imagen. Debe ser un enlace directo (i.imgur.com) y terminar en .png -->
                 image: "https://i.imgur.com/ZGZNM88.png",
                 options: [
                     { text: "$4.4 \\, m$", correct: true },
@@ -467,7 +452,7 @@
                             El rayo forma un triángulo en el aire con $opuesto = 1.5 \\, m$ y $adyacente = 1.2 \\, m$.<br>
                             $\\tan(\\theta_a) = \\dfrac{1.5 \\, m}{1.2 \\, m} = 1.25$<br>
                             $\\theta_a = \\arctan(1.25) \\approx 51.3^{\\circ}$<br><br>
-    
+   
                             <strong>Paso 2: Calcular el ángulo de refracción $\\theta_b$ (en el agua).</strong><br>
                             Usamos la Ley de Snell: $n_a \\sin(\\theta_a) = n_b \\sin(\\theta_b)$<br>
                             $1.00 \\cdot \\sin(51.3^{\\circ}) = 1.333 \\cdot \\sin(\\theta_b)$<br>
@@ -479,14 +464,11 @@
                             $\\tan(\\theta_b) = \\dfrac{x}{d}$<br>
                             $x = d \\cdot \\tan(\\theta_b) = (4.0 \\, m) \\cdot \\tan(35.8^{\\circ})$<br>
                             $x = (4.0 \\, m) \\cdot 0.721 \\approx 2.9 \\, m$<br><br>
-    
+   
                             <strong>Paso 4: Calcular la distancia total.</strong><br>
                             $x_{total} = x_{aire} + x_{agua} = 1.5 \\, m + 2.9 \\, m = 4.4 \\, m$`
                 }
-            }
-            // --- FIN DE PROBLEMA 15 ---
-            ,
-            // --- INICIO PROBLEMA 16 (COMBINADO) ---
+            },
             {
                 name: "Desplazamiento (Teoría y Cálculo)",
                 question: "<strong>16.</strong> (Parte A) Dada la figura, ¿cuál es la expresión algebraica para el desplazamiento lateral $d$? <br><br> (Parte B) Calcule el valor de $d$ si $\\theta_a = 66.0^{\\circ}$, $n' = 1.80$, $t = 2.40 \\, cm$, y $n_{aire} \\approx 1.00$.",
@@ -514,8 +496,96 @@
                             $d = \\dfrac{(2.40 \\, cm) \sin(35.5^{\\circ})}{\\cos(30.5^{\\circ})}$<br>
                             $d = \\dfrac{(2.40 \\, cm) \cdot (0.5807)}{0.8616} \\approx 1.62 \\, cm$`
                 }
+            },
+            {
+                name: "Refracción Atmosférica",
+                question: "<strong>17.</strong> Cuando el Sol se oculta, parece estar justo sobre el horizonte aunque geométricamente ya está debajo debido a la refracción. Suponiendo que la atmósfera tiene densidad uniforme con $n = 1.0003$, altura $h = 20 \\, km$, y $R = 6378 \\, km$:<br><strong>a)</strong> Deduzca la expresión correcta para la desviación $\\delta$ usando la ley de Snell y geometría.<br><strong>b)</strong> Calcule el valor de $\\delta$.",
+                image: "https://imgur.com/phBUUAt.png",
+                options: [
+                    { text: "a) $\\delta = \\arcsin\\left(\\frac{nR}{R+h}\\right) - \\arcsin\\left(\\frac{R}{R+h}\\right)$, b) $0.23^{\\circ}$", correct: true },
+                    { text: "a) $\\delta = \\arcsin\\left(\\frac{n(R+h)}{R}\\right) - \\arcsin\\left(\\frac{R}{R+h}\\right)$, b) $0.50^{\\circ}$", correct: false },
+                    { text: "a) $\\delta = \\arcsin\\left(\\frac{R}{R+h}\\right) - \\arcsin\\left(\\frac{nR}{R+h}\\right)$, b) $-0.23^{\\circ}$", correct: false },
+                    { text: "a) $\\delta = \\arcsin\\left(\\frac{nR}{R+h}\\right) + \\arcsin\\left(\\frac{R}{R+h}\\right)$, b) $1.23^{\\circ}$", correct: false }
+                ],
+                solution: {
+                    text: `<strong>a) Deducción:</strong><br>
+                           En el triángulo formado por el centro de la Tierra ($C$), el observador ($O$) y el punto de entrada en la atmósfera ($P$):<br>
+                           1. El rayo es tangente en $O$, así que el ángulo en $C$ con respecto a la normal en $P$ nos da $\\sin(\\theta_b) = \\frac{R}{R+h}$.<br>
+                           2. Aplicando Snell en $P$: $1 \\cdot \\sin(\\theta_a) = n \\cdot \\sin(\\theta_b) \\Rightarrow \\sin(\\theta_a) = n \\frac{R}{R+h}$.<br>
+                           3. La desviación es $\\delta = \\theta_a - \\theta_b = \\arcsin(\\frac{nR}{R+h}) - \\arcsin(\\frac{R}{R+h})$.<br><br>
+                           <strong>b) Cálculo:</strong><br>
+                           $\\dfrac{R}{R+h} \\approx 0.99688 \\Rightarrow \\theta_b \\approx 85.47^{\\circ}$<br>
+                           $\\dfrac{nR}{R+h} \\approx 0.99718 \\Rightarrow \\theta_a \\approx 85.70^{\\circ}$<br>
+                           $\\delta = 85.70^{\\circ} - 85.47^{\\circ} = 0.23^{\\circ}$`
+                }
+            },
+            // --- PROBLEMA 18 ---
+            {
+                name: "Principio de Fermat (Parte 1: Expresión del Tiempo)",
+                question: "<strong>18.</strong> Un rayo de luz viaja con rapidez $c$ del punto 1 al punto 2, reflejándose en una superficie plana a una distancia horizontal $x$ del punto 1. La distancia horizontal total es $l$. Identifique la expresión correcta para el tiempo total $t$ de recorrido en función de $x$.",
+                image: "https://imgur.com/qvasdc3.png",
+                options: [
+                    { text: "$t = \\frac{\\sqrt{y_1^2 + x^2} + \\sqrt{y_2^2 + (l-x)^2}}{c}$", correct: true },
+                    { text: "$t = \\frac{\\sqrt{y_1^2 + x^2} - \\sqrt{y_2^2 + (l-x)^2}}{c}$", correct: false },
+                    { text: "$t = c(\\sqrt{y_1^2 + x^2} + \\sqrt{y_2^2 + (l-x)^2})$", correct: false },
+                    { text: "$t = \\sqrt{y_1^2 + x^2} + \\sqrt{y_2^2 + (l-x)^2}$", correct: false }
+                ],
+                solution: {
+                    text: `El tiempo total es la suma del tiempo en el primer tramo ($t_1$) y el segundo ($t_2$).<br>
+                           $t = t_1 + t_2 = \\frac{d_1}{c} + \\frac{d_2}{c}$<br>
+                           Usando el teorema de Pitágoras para las distancias hipotenusas:<br>
+                           $d_1 = \\sqrt{y_1^2 + x^2}$<br>
+                           $d_2 = \\sqrt{y_2^2 + (l-x)^2}$<br>
+                           Sustituyendo:<br>
+                           $t = \\frac{\\sqrt{y_1^2 + x^2} + \\sqrt{y_2^2 + (l-x)^2}}{c}$`
+                }
+            },
+            // --- PROBLEMA 19 ---
+            {
+                name: "Principio de Fermat (Parte 2: Derivación)",
+                question: "<strong>19.</strong> Utilizando la expresión del tiempo $t$ encontrada en el problema anterior, obtenga la derivada $\\frac{dt}{dx}$ e iguálela a cero para encontrar el tiempo mínimo. ¿A qué condición geométrica conduce esto y qué ley física demuestra?",
+                image: "https://imgur.com/qvasdc3.png",
+                options: [
+                    { text: "$\\frac{x}{\\sqrt{y_1^2 + x^2}} = \\frac{l-x}{\\sqrt{y_2^2 + (l-x)^2}} \\implies \\sin \\theta_1 = \\sin \\theta_2 \\implies \\theta_1 = \\theta_2$ (Ley de Reflexión)", correct: true },
+                    { text: "$\\frac{x}{\\sqrt{y_1^2 + x^2}} = -\\frac{l-x}{\\sqrt{y_2^2 + (l-x)^2}} \\implies \\cos \\theta_1 = \\cos \\theta_2$ (Ley de Refracción)", correct: false },
+                    { text: "$\\frac{1}{\\sqrt{y_1^2 + x^2}} = \\frac{1}{\\sqrt{y_2^2 + (l-x)^2}} \\implies \\theta_1 = \\theta_2$ (Principio de Huygens)", correct: false },
+                    { text: "$x = l-x \\implies \\theta_1 = \\theta_2$ (Ley de Propagación Rectilínea)", correct: false }
+                ],
+                solution: {
+                    text: `<strong>Paso 1: Derivar $t$ con respecto a $x$.</strong><br>
+                           $\\frac{dt}{dx} = \\frac{1}{c} \\left[ \\frac{1}{2}(y_1^2 + x^2)^{-1/2}(2x) + \\frac{1}{2}(y_2^2 + (l-x)^2)^{-1/2}(2(l-x)(-1)) \\right]$<br>
+                           $\\frac{dt}{dx} = \\frac{1}{c} \\left[ \\frac{x}{\\sqrt{y_1^2 + x^2}} - \\frac{l-x}{\\sqrt{y_2^2 + (l-x)^2}} \\right]$<br><br>
+                           <strong>Paso 2: Igualar a cero (Tiempo Mínimo).</strong><br>
+                           $\\frac{x}{\\sqrt{y_1^2 + x^2}} = \\frac{l-x}{\\sqrt{y_2^2 + (l-x)^2}}$<br>
+                           Observando la geometría de la figura, estos términos son los senos de los ángulos con la normal:<br>
+                           $\\sin \\theta_1 = \\sin \\theta_2 \\implies \\theta_1 = \\theta_2$<br>
+                           Esto demuestra la <strong>Ley de Reflexión</strong>.`
+                }
+            },
+            // --- PROBLEMA 20 ---
+            {
+                name: "Refracción: Tiempo de viaje",
+                question: "<strong>20.</strong> Un rayo de luz va del punto A (donde la rapidez es $v_1$) al punto B (donde la rapidez es $v_2$). El rayo incide en la interfase a una distancia horizontal $x$ del punto A. La altura de A es $h_1$, la profundidad de B es $h_2$ y la distancia horizontal total es $l$.<br>Seleccione la expresión correcta para el tiempo total $t$ que tarda la luz en ir de A a B.",
+                image: "https://imgur.com/YOHQv9G.png", 
+                options: [
+                    { text: "$t = \\frac{\\sqrt{h_1^2 + x^2}}{v_1} + \\frac{\\sqrt{h_2^2 + (l-x)^2}}{v_2}$", correct: true },
+                    { text: "$t = \\frac{\\sqrt{h_1^2 + x^2}}{v_2} + \\frac{\\sqrt{h_2^2 + (l-x)^2}}{v_1}$", correct: false },
+                    { text: "$t = v_1\\sqrt{h_1^2 + x^2} + v_2\\sqrt{h_2^2 + (l-x)^2}$", correct: false },
+                    { text: "$t = \\frac{\\sqrt{h_1^2 + x^2} + \\sqrt{h_2^2 + (l-x)^2}}{v_1 + v_2}$", correct: false }
+                ],
+                solution: {
+                    text: `El tiempo total es la suma del tiempo en el medio 1 y el medio 2 ($t = t_1 + t_2$).<br>
+                           Recordamos que $t = \\text{distancia} / \\text{rapidez}$.<br><br>
+                           <strong>Tramo 1 (Medio 1):</strong><br>
+                           Distancia $d_1$ (hipotenusa): $\\sqrt{h_1^2 + x^2}$.<br>
+                           Tiempo $t_1 = \\frac{\\sqrt{h_1^2 + x^2}}{v_1}$.<br><br>
+                           <strong>Tramo 2 (Medio 2):</strong><br>
+                           Distancia $d_2$ (hipotenusa): $\\sqrt{h_2^2 + (l-x)^2}$.<br>
+                           Tiempo $t_2 = \\frac{\\sqrt{h_2^2 + (l-x)^2}}{v_2}$.<br><br>
+                           <strong>Total:</strong><br>
+                           $t = \\frac{\\sqrt{h_1^2 + x^2}}{v_1} + \\frac{\\sqrt{h_2^2 + (l-x)^2}}{v_2}$`
+                }
             }
-            // --- FIN DE PROBLEMA 16 ---
         ];
 
 
@@ -549,17 +619,13 @@
         const modeSelectionBtns = document.getElementById('mode-selection-btns');
         
         function renderKatex() {
-            // Verificamos si la función 'renderMathInElement' existe antes de llamarla
             if (typeof renderMathInElement === 'function') {
                 renderMathInElement(document.body, {
                     delimiters: [
                         {left: '$$', right: '$$', display: true},
                         {left: '$', right: '$', display: false},
                     ],
-                    // trust: true // Use if you have complex custom macros
                 });
-            } else {
-                console.error("KaTeX auto-render.min.js no se cargó correctamente.");
             }
         }
 
@@ -601,12 +667,11 @@
             questionCounter.textContent = `PROBLEMA ${qIndex + 1} DE ${totalQuestions}`;
             questionText.innerHTML = questionData.question;
             
-            // Lógica para mostrar la imagen si existe
             if (questionData.image) {
                 circuitImage.src = questionData.image;
                 circuitImageContainer.classList.remove('hidden');
             } else {
-                circuitImageContainer.classList.add('hidden'); // Ocultamos el contenedor de imagen si no hay
+                circuitImageContainer.classList.add('hidden');
             }
             
             optionsContainer.innerHTML = '';
@@ -706,8 +771,6 @@
                 };
                 problemList.appendChild(problemBtn);
             });
-            
-            // FIX: Esta llamada es necesaria para renderizar el KaTeX en los botones
             renderKatex();
         }
 
